@@ -12,21 +12,28 @@ if (!process.argv[2]) {
 
 const is_hooks = Boolean(process.argv[3]);
 
-let fs_name = process.argv[2].split('/')
+let fs_name = process.argv[2].replace(/\//g, '\\').split('\\')
 fs_name = fs_name[fs_name.length - 1]
 fs_name = fs_name.split('')
 fs_name[0] = fs_name[0].toUpperCase()
 fs_name = fs_name.join('').replace(/(-|_)(.)/g, (a) => a[1].toUpperCase())
 
-const class_template = `
-import Taro from '@tarojs/taro'
+const class_template = `import Taro from '@tarojs/taro'
 
 import './index.scss'
 
 export default class ${fs_name} extends Component {
-  constructor() {
+  config = {}
+
+  static defaultProps = {}
+
+  constructor(props) {
     super(props)
     this.state = {}
+  }
+
+  get router() {
+    return this.$router.params
   }
 
   componentWillMount() { }
@@ -40,15 +47,20 @@ export default class ${fs_name} extends Component {
   componentDidHide() { }
 
   render() {
-    <View></View>
+    const { } = this.props
+    const { } = this.state
+
+    return (
+      <View></View>
+    )
   }
-}
-`
+}`;
+
 const hooks_template = `import Taro, { useEffect, useState } from '@tarojs/taro'
 
 import './index.scss'
 
-export default function Test(props) {
+function ${fs_name}(props) {
   const { } = props
   const [state, set_state] = useState()
 
@@ -61,7 +73,11 @@ export default function Test(props) {
   )
 }
 
-`
+${fs_name}.config = {}
+${fs_name}.defaultProps = {}
+
+export default ${fs_name}`;
+
 try {
   // D:/my-github-apps/min-app1/src/pages/ppo
   fs.mkdirSync(process.argv[2]) // 创建文件
